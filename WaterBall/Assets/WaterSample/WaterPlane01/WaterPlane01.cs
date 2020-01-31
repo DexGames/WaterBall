@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Water : MonoBehaviour
+public class WaterPlane01 : MonoBehaviour
 {
     private float time = 0f;
     private Material material = null;

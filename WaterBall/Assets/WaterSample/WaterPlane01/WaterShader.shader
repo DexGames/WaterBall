@@ -25,7 +25,6 @@ Shader "Custom/WaterShader"
             CGPROGRAM
 
 			#define TEXTURE_SIZE 2048
-			//#define NORMAL_OUTPUT
 
             #pragma vertex VS
 			#pragma hull HSMain
@@ -63,20 +62,14 @@ Shader "Custom/WaterShader"
 			{
                 float4 pos : SV_Position;
                 float2 uv : TEXCOORD0;
-
-				#ifdef NORMAL_OUTPUT
-				float4 color : COLOR;
-				#endif
+				float3 normal :NORMAL;
             };
 
 			struct fs_input
 			{
-                float2 uv : TEXCOORD0;
                 float4 pos : SV_POSITION;
-
-				#ifdef NORMAL_OUTPUT
-				float4 color : COLOR;
-				#endif
+                float2 uv : TEXCOORD0;
+				float3 normal :NORMAL;
 			};
 
             sampler2D _MainTex;				// メインテクスチャ
@@ -151,14 +144,9 @@ Shader "Custom/WaterShader"
 
 				float3 normal = normalize(cross(float3(1, 1, yGrad), float3(1, 1, xGrad)));
 				
-				#ifdef NORMAL_OUTPUT
-				float3 L = normalize(float3(-5, 10, 3) - pos);
-				o.color = tex2Dlod(_MainTex, float4(uv,0,0)) * max(dot(L, normal), 0.4);
-				o.color.a = 1;
-				#endif
-
 				o.pos = UnityObjectToClipPos(float4(pos, 1));
 				o.uv = uv;
+				o.normal = normal;
 
 				return o;
 			}
@@ -166,11 +154,7 @@ Shader "Custom/WaterShader"
 			// フラグメントシェーダー
             fixed4 FS (fs_input i) : SV_Target
             {
-				#ifdef NORMAL_OUTPUT
-				return i.color;
-				#else
-                return tex2D(_MainTex, i.uv);
-				#endif
+				return tex2D(_MainTex, i.uv);
             }
 
             ENDCG
