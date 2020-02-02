@@ -13,7 +13,6 @@ Shader "Custom/WaterShader2"
         LOD 100
 
 		ZWrite Off
-		Blend SrcAlpha OneMinusSrcAlpha 
 
         Pass
         {
@@ -116,6 +115,9 @@ Shader "Custom/WaterShader2"
 				float3 pos = i[0].pos * bary.x + i[1].pos * bary.y + i[2].pos * bary.z;
 				float2 uv = i[0].uv * bary.x + i[1].uv * bary.y + i[2].uv * bary.z;
 				uv = TRANSFORM_TEX(uv, _MainTex);
+
+				float height = tex2Dlod(_MainTex, float4(uv, 0, 0)).y;
+				pos.y = height;
 				
 				o.pos = UnityObjectToClipPos(float4(pos, 1));
 				o.uv = uv;

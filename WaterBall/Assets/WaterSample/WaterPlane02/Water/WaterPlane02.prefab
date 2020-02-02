@@ -106,3 +106,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 13352432092382a42be123e97e93a2cd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  customTexture: {fileID: 8600000, guid: fec0f968beb0ad24c922160c7e4e81b1, type: 2}

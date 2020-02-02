@@ -2,13 +2,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class WaterPlane02 : MonoBehaviour
+public class MakeWater : MonoBehaviour
 {
-    private Material material = null;
-
     void Start()
     {
-        this.material = GetComponent<MeshRenderer>().material;
     }
 
     void Update()
