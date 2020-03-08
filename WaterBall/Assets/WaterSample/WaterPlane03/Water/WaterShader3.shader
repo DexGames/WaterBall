@@ -69,7 +69,6 @@ Shader "Custom/WaterShader3"
                 float4 pos : SV_POSITION;
                 float2 uv : TEXCOORD0;
 				float3 normal : NORMAL;
-				float4 color : COLOR;
 			};
 
             sampler2D _MainTex; // メインテクスチャ
