@@ -38,6 +38,9 @@ Shader "Custom/WaterShader4"
 		[Header(NoiseParameter)]
 		_NoiseSizeLerp("Noise Size", Range(0, 1)) = 0.5
 		_NoiseStrength("Noise Strength", Range(0, 3)) = 1.5
+
+		[Header(SkyParameter)]
+		_SkyColor("Sky Color", Color) = (255, 255, 255, 255)
 	}
 
     SubShader
@@ -91,6 +94,9 @@ Shader "Custom/WaterShader4"
             float4 _MainTex_ST;
 			float4 _TessFactor;
 			float4 _LightColor0;
+
+			// 空パラメータ
+			float4 _SkyColor;
  
 			static const int sub_wave_num = 4;
 			static const int wave_num = 8;
@@ -208,19 +214,30 @@ Shader "Custom/WaterShader4"
 				// --------------------
 				// カラー計算
 				// --------------------
-				float3 lightDir = normalize(UnityWorldSpaceLightDir(worldPos));
-				float3 viewDir = normalize(UnityWorldSpaceViewDir(worldPos));
-				float3 halfDir = normalize(lightDir + viewDir);
-
+				float3 lightDir = normalize(UnityWorldSpaceLightDir(worldPos));	// ライトベクトル
+				float3 viewDir = normalize(UnityWorldSpaceViewDir(worldPos));	// ビューベクトル
+				float3 reflectDir = reflect(-viewDir, normal);					// 反射ベクトル
+				
 				float diffuse = saturate(dot(normal, lightDir)) * _LightColor0;
 				float waterHeight = worldPos.y - geometryPos.y;
+
+				// 反射ベクトルのyが0に近い = 反射位置がかなり遠い = 反射による色の変化を強く受ける
+				float reflectColorRatio = 1.0 - max(0.0, reflectDir.y);
+				float3 reflectColor = (float3(1, 1, 1) - _SkyColor) * reflectColorRatio + _SkyColor;
+
+				float r = 0.02;
+				float facing = saturate(1.0 - dot(normal, viewDir));
+				float fresnel = r + (1.0 - r) * pow(facing, 5.0);
+				
+				float3 waterBaseColor = _WaterBaseColor * diffuse * _WaterBaseColorStrength;
 				float3 waterColor = 
-					diffuse * _WaterBaseColor * _WaterBaseColorStrength +		// 基本カラー
-					waterHeight * _WaterShallowColor * _WaterHeightColorCoef;	// 浅瀬カラー
- 
+					lerp(waterBaseColor, reflectColor, fresnel) +							// 基本カラー
+					(waterHeight * 0.5 + 0.2) * _WaterShallowColor * _WaterHeightColorCoef;	// 浅瀬カラー
+
                 return fixed4(waterColor, 1.0);
             }
             ENDCG
         }
     }
 }
+
