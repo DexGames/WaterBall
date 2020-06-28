@@ -227,7 +227,7 @@ Shader "Custom/WaterRenderTexture"
 
 				o.color = fixed4(waterBaseColor, 1.0);
 				o.normal = fixed4(normal, 1.0);
-				o.position = fixed4(abs(p.y), sign(p.y), 0, 1.0);	// r = 水の高さ, g = 水の高さの正負(1 = 正, 0 = 負)
+				o.position = fixed4(p, 1.0);
 
                 return o;
             }
